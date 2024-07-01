@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Processing...</title>
+    <script>
+        async function handleIdToken() {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const idToken = hashParams.get('id_token');
+            
+            if (!idToken) {
+                console.error("id_token not found in URL fragment");
+                return;
+            }
+ 
+            try {
+const response = await fetch('https://.azurewebsites.net/api/<your-function-name>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id_token: idToken })
+                });
+ 
+                if (response.status === 302) {
+                    const redirectUrl = response.headers.get('Location');
+                    window.location.replace(redirectUrl);
+                } else {
+                    const responseBody = await response.json();
+                    console.error("Failed to redirect:", responseBody);
+                    document.body.innerHTML = "Error: " + JSON.stringify(responseBody);
+                }
+            } catch (error) {
+                console.error("Error during redirection:", error);
+                document.body.innerHTML = "Error: " + error;
+            }
+        }
+ 
+        // Execute the function on page load
+        window.onload = handleIdToken;
+    </script>
+</head>
+<body>
+    <h1>Processing...</h1>
+</body>
+</html>
